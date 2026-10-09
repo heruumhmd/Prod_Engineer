@@ -1,13 +1,15 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { Briefcase, Upload, Clock, Pencil, Trash2, Plus } from 'lucide-react';
 import Navbar from '@/components/Navbar';
-import { getVacancies } from '@/lib/api';
+import { getVacancies, deleteVacancy } from '@/lib/api';
 import { formatDateIndo } from '@/lib/labels';
 
 export default function DashboardPage() {
+  const queryClient = useQueryClient();
+
   const {
     data: vacancies = [],
     isLoading,
@@ -16,6 +18,22 @@ export default function DashboardPage() {
     queryKey: ['vacancies'],
     queryFn: () => getVacancies(),
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => deleteVacancy(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['vacancies'] });
+    },
+    onError: (err) => {
+      alert('Gagal menghapus lowongan: ' + (err as Error).message);
+    },
+  });
+
+  const handleDelete = (id: number, title: string) => {
+    if (window.confirm(`Apakah Anda yakin ingin menghapus lowongan "${title}"?`)) {
+      deleteMutation.mutate(id);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-[#fafafa]">
@@ -118,17 +136,19 @@ export default function DashboardPage() {
 
                       {/* Action buttons on card */}
                       <div className="flex items-center gap-2 mt-4">
-                        <button
-                          type="button"
+                        <Link
+                          href={`/dashboard/vacancies/${vacancy.id}/edit`}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#fafafa] border border-zinc-200 rounded-md text-xs font-medium text-zinc-700 hover:bg-zinc-100 transition-colors cursor-pointer"
                         >
                           <Pencil className="w-3.5 h-3.5 text-zinc-500" />
                           <span>Edit</span>
-                        </button>
+                        </Link>
 
                         <button
                           type="button"
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#fecdd3] text-[#be123c] rounded-md text-xs font-semibold hover:bg-rose-200 transition-colors cursor-pointer"
+                          onClick={() => handleDelete(vacancy.id, vacancy.title)}
+                          disabled={deleteMutation.isPending}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#fecdd3] text-[#be123c] rounded-md text-xs font-semibold hover:bg-rose-200 transition-colors cursor-pointer disabled:opacity-50"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                           <span>Hapus</span>

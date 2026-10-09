@@ -45,6 +45,10 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     );
   }
 
+  if (response.status === 204) {
+    return {} as T;
+  }
+
   const json = await response.json();
   return json.data !== undefined ? json.data : json;
 }
@@ -62,5 +66,18 @@ export async function createVacancy(payload: CreateVacancyPayload): Promise<Vaca
   return request<Vacancy>('/vacancies', {
     method: 'POST',
     body: JSON.stringify(payload),
+  });
+}
+
+export async function updateVacancy(id: string | number, payload: Partial<CreateVacancyPayload>): Promise<Vacancy> {
+  return request<Vacancy>(`/vacancies/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function deleteVacancy(id: string | number): Promise<void> {
+  return request<void>(`/vacancies/${id}`, {
+    method: 'DELETE',
   });
 }

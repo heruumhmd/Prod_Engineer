@@ -8,4 +8,4 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::apiResource('vacancies', VacancyController::class)->only(['index', 'show', 'store']);
+Route::apiResource('vacancies', VacancyController::class);

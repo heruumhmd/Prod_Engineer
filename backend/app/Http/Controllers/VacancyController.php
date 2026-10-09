@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreVacancyRequest;
+use App\Http\Requests\UpdateVacancyRequest;
 use App\Http\Resources\VacancyResource;
 use App\Models\Company;
 use App\Models\Vacancy;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
 
 class VacancyController extends Controller
 {
@@ -62,5 +64,32 @@ class VacancyController extends Controller
         return (new VacancyResource($vacancy))
             ->response()
             ->setStatusCode(201);
+    }
+
+    /**
+     * Update the specified vacancy in storage.
+     */
+    public function update(UpdateVacancyRequest $request, string $id): VacancyResource
+    {
+        $vacancy = Vacancy::with('company')->findOrFail($id);
+
+        $validated = $request->validated();
+        $validated['is_remote'] = $request->boolean('is_remote');
+        $validated['show_salary'] = $request->boolean('show_salary');
+
+        $vacancy->update($validated);
+
+        return new VacancyResource($vacancy);
+    }
+
+    /**
+     * Remove the specified vacancy from storage.
+     */
+    public function destroy(string $id): Response
+    {
+        $vacancy = Vacancy::findOrFail($id);
+        $vacancy->delete();
+
+        return response()->noContent();
     }
 }

@@ -161,4 +161,76 @@ class VacancyApiTest extends TestCase
         $notFoundResponse->assertStatus(404)
             ->assertJsonPath('message', 'Resource not found.');
     }
+
+    public function test_put_valid_updates_vacancy(): void
+    {
+        $company = Company::factory()->create();
+        $vacancy = Vacancy::factory()->create([
+            'company_id' => $company->id,
+            'title' => 'Initial Title',
+            'salary_min' => 5000000,
+        ]);
+
+        $updatePayload = [
+            'title' => 'Updated Senior Product Engineer',
+            'position' => 'Product Engineer',
+            'employment_type' => 'full_time',
+            'candidates_needed' => 3,
+            'active_until' => '2024-01-31',
+            'location' => 'Jakarta',
+            'is_remote' => true,
+            'description' => '<p>Updated description</p>',
+            'salary_min' => 12000000,
+            'salary_max' => 18000000,
+            'show_salary' => true,
+            'min_experience' => '4_5',
+        ];
+
+        $response = $this->putJson("/api/vacancies/{$vacancy->id}", $updatePayload);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.title', 'Updated Senior Product Engineer')
+            ->assertJsonPath('data.location', 'Jakarta')
+            ->assertJsonPath('data.is_remote', true);
+
+        $this->assertDatabaseHas('vacancies', [
+            'id' => $vacancy->id,
+            'title' => 'Updated Senior Product Engineer',
+            'location' => 'Jakarta',
+            'candidates_needed' => 3,
+        ]);
+    }
+
+    public function test_put_not_found_returns_404(): void
+    {
+        $response = $this->putJson('/api/vacancies/99999', [
+            'title' => 'Test',
+            'position' => 'Test',
+            'employment_type' => 'full_time',
+            'candidates_needed' => 1,
+            'active_until' => '2024-01-01',
+            'location' => 'Bandung',
+            'description' => 'Desc',
+            'salary_min' => 1000,
+            'min_experience' => '1_3',
+        ]);
+
+        $response->assertStatus(404)
+            ->assertJsonPath('message', 'Resource not found.');
+    }
+
+    public function test_delete_removes_vacancy(): void
+    {
+        $company = Company::factory()->create();
+        $vacancy = Vacancy::factory()->create(['company_id' => $company->id]);
+
+        $response = $this->deleteJson("/api/vacancies/{$vacancy->id}");
+        $response->assertStatus(204);
+
+        $this->assertDatabaseMissing('vacancies', ['id' => $vacancy->id]);
+
+        $notFoundResponse = $this->deleteJson("/api/vacancies/{$vacancy->id}");
+        $notFoundResponse->assertStatus(404)
+            ->assertJsonPath('message', 'Resource not found.');
+    }
 }
