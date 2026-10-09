@@ -107,38 +107,38 @@ function VacancyDetailContent() {
         </div>
 
         {/* Header section */}
-        <div className="flex items-start gap-5 pb-8 border-b border-zinc-200">
-          <div className="w-16 h-16 md:w-20 md:h-20 bg-[#2d3e50] rounded-lg flex items-center justify-center shrink-0 text-white font-semibold text-xs md:text-sm select-none">
+        <div className="flex items-start gap-5 pb-8 border-b border-slate-200">
+          <div className="w-16 h-16 md:w-20 md:h-20 bg-[#2d3e50] rounded-xl flex items-center justify-center shrink-0 text-white font-bold text-xs md:text-sm select-none shadow-xs">
             <span>dicoding</span>
           </div>
 
           <div className="flex flex-col gap-1.5">
             <h1
               data-testid="vacancy-detail-title"
-              className="text-2xl md:text-3xl font-bold text-zinc-900 tracking-tight"
+              className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight"
             >
               {vacancy.title}
             </h1>
 
-            <p className="text-xs md:text-sm text-zinc-600">
-              Sektor Bisnis: <span className="font-medium">{vacancy.company?.business_sector || 'Technology'}</span>
+            <p className="text-xs md:text-sm text-slate-500">
+              Sektor Bisnis: <span className="font-semibold text-slate-700">{vacancy.company?.business_sector || 'Technology'}</span>
             </p>
 
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs md:text-sm text-zinc-600 mt-1">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs md:text-sm text-slate-600 mt-1">
               <div className="flex items-center gap-1.5">
-                <Building2 className="w-4 h-4 text-zinc-400 shrink-0" />
+                <Building2 className="w-4 h-4 text-slate-400 shrink-0" />
                 <span className="text-blue-600 hover:underline cursor-pointer font-medium">
                   {vacancy.company?.name || 'Dicoding Indonesia'}
                 </span>
               </div>
 
               <div className="flex items-center gap-1.5">
-                <MapPin className="w-4 h-4 text-zinc-400 shrink-0" />
+                <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
                 <span>{vacancy.location}</span>
               </div>
 
               <div className="flex items-center gap-1.5">
-                <Users className="w-4 h-4 text-zinc-400 shrink-0" />
+                <Users className="w-4 h-4 text-slate-400 shrink-0" />
                 <span>{vacancy.company?.size_range || '50-100'} Karyawan</span>
               </div>
             </div>
@@ -147,39 +147,39 @@ function VacancyDetailContent() {
 
         {/* Badge employment type */}
         <div className="py-6">
-          <span className="inline-block bg-blue-50 text-blue-600 border border-blue-200 rounded-full px-4 py-1 text-xs font-semibold">
+          <span className="inline-block bg-blue-50 text-blue-700 border border-blue-200/80 rounded-full px-4 py-1 text-xs font-semibold tracking-wide">
             {employmentBadge}
           </span>
         </div>
 
         {/* Job Description (Sanitized HTML) */}
-        <div className="prose prose-zinc max-w-none pb-10 border-b border-zinc-200 text-zinc-800 text-sm md:text-base leading-relaxed [&_h3]:text-lg [&_h3]:font-bold [&_h3]:text-zinc-900 [&_h3]:mt-6 [&_h3]:mb-3 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-3 [&_li]:my-1.5 [&_a]:text-blue-600 [&_a]:underline">
+        <div className="prose prose-slate max-w-none pb-10 border-b border-slate-200 text-slate-700 text-sm md:text-base leading-relaxed [&_h3]:text-lg [&_h3]:font-bold [&_h3]:text-slate-900 [&_h3]:mt-6 [&_h3]:mb-3 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-3 [&_li]:my-1.5 [&_a]:text-blue-600 [&_a]:underline">
           <SanitizedHtml html={vacancy.description} />
         </div>
 
         {/* Informasi Tambahan */}
         <section className="py-8">
-          <h2 className="text-lg font-bold text-zinc-900 mb-6">
+          <h2 className="text-lg font-bold text-slate-900 mb-5 tracking-tight">
             Informasi Tambahan
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            <div>
-              <p className="text-sm text-zinc-500 mb-1">Pengalaman bekerja</p>
-              <p className="text-base font-semibold text-zinc-900">{expLabel}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="bg-slate-50/80 border border-slate-200/80 rounded-xl p-4">
+              <p className="text-xs font-medium text-slate-500 mb-1">Pengalaman bekerja</p>
+              <p className="text-base font-bold text-slate-900">{expLabel}</p>
             </div>
 
-            <div>
-              <p className="text-sm text-zinc-500 mb-1">Kandidat yang dibutuhkan</p>
-              <p className="text-base font-semibold text-zinc-900">
+            <div className="bg-slate-50/80 border border-slate-200/80 rounded-xl p-4">
+              <p className="text-xs font-medium text-slate-500 mb-1">Kandidat yang dibutuhkan</p>
+              <p className="text-base font-bold text-slate-900">
                 {vacancy.candidates_needed} kandidat
               </p>
             </div>
 
             {vacancy.show_salary && (
-              <div>
-                <p className="text-sm text-zinc-500 mb-1">Rentang Gaji</p>
-                <p className="text-base font-semibold text-zinc-900">
+              <div className="bg-slate-50/80 border border-slate-200/80 rounded-xl p-4">
+                <p className="text-xs font-medium text-slate-500 mb-1">Rentang Gaji</p>
+                <p className="text-base font-bold text-slate-900">
                   {formatRupiah(vacancy.salary_min)}
                   {vacancy.salary_max ? ` - ${formatRupiah(vacancy.salary_max)}` : ''}
                 </p>

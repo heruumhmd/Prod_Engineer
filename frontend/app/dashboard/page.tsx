@@ -80,13 +80,13 @@ export default function DashboardPage() {
         {/* Main Content */}
         <main className="flex-1">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
               Lowongan Saya
             </h1>
 
             <Link
               href="/dashboard/vacancies/new"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-[#2d3e50] text-white rounded-lg text-sm font-medium hover:bg-zinc-800 transition-colors shadow-xs active:scale-[0.98]"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#2d3e50] text-white rounded-xl text-sm font-semibold hover:bg-[#1e2b38] transition-all shadow-xs active:scale-[0.98]"
             >
               <Plus className="w-4 h-4" />
               <span>Buat lowongan</span>
@@ -96,15 +96,15 @@ export default function DashboardPage() {
           {isLoading ? (
             <DashboardCardSkeleton count={3} />
           ) : isError ? (
-            <div className="p-6 text-center bg-rose-50 border border-rose-200 rounded-lg text-rose-700">
+            <div className="p-6 text-center bg-rose-50 border border-rose-200 rounded-xl text-rose-700">
               <p className="font-semibold text-sm">Gagal memuat lowongan dashboard</p>
             </div>
           ) : vacancies.length === 0 ? (
-            <div className="p-12 text-center bg-white border border-dashed border-zinc-200 rounded-lg">
-              <p className="text-zinc-600 text-sm mb-4">Belum ada lowongan yang dibuat.</p>
+            <div className="p-12 text-center bg-white border border-dashed border-slate-200 rounded-2xl">
+              <p className="text-slate-600 text-sm mb-4">Belum ada lowongan yang dibuat.</p>
               <Link
                 href="/dashboard/vacancies/new"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-[#2d3e50] text-white rounded-lg text-sm font-medium hover:bg-zinc-800 transition-colors active:scale-[0.98]"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[#2d3e50] text-white rounded-xl text-sm font-semibold hover:bg-[#1e2b38] transition-all active:scale-[0.98]"
               >
                 <Plus className="w-4 h-4" />
                 <span>Buat lowongan pertama</span>
@@ -116,31 +116,31 @@ export default function DashboardPage() {
                 <div
                   key={vacancy.id}
                   data-testid="dashboard-vacancy-card"
-                  className="bg-white border border-zinc-200 rounded-lg p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs hover:border-zinc-300 transition-all"
+                  className="bg-white border border-slate-200/90 rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all"
                 >
                   <div className="flex items-start gap-4">
                     {/* Navy logo box with '9' mark matching Figma Frame 3 */}
-                    <div className="w-14 h-14 bg-[#2d3e50] rounded-lg flex items-center justify-center text-white text-xl font-bold shrink-0 select-none">
+                    <div className="w-14 h-14 bg-[#2d3e50] rounded-xl flex items-center justify-center text-white text-xl font-bold shrink-0 select-none shadow-2xs">
                       <span>9</span>
                     </div>
 
                     <div>
                       <Link
                         href={`/vacancies/${vacancy.id}`}
-                        className="text-base font-bold text-zinc-900 hover:text-blue-600 transition-colors"
+                        className="text-base font-bold text-slate-900 hover:text-blue-600 transition-colors tracking-tight"
                       >
                         {vacancy.title}
                       </Link>
 
-                      <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-zinc-600 mt-2">
+                      <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-slate-500 mt-2">
                         <div className="flex items-center gap-1.5">
-                          <Upload className="w-3.5 h-3.5 text-zinc-400" />
-                          <span>Dibuat: {formatDateIndo(vacancy.created_at)}</span>
+                          <Upload className="w-3.5 h-3.5 text-slate-400" />
+                          <span>Dibuat: <span className="font-medium text-slate-600">{formatDateIndo(vacancy.created_at)}</span></span>
                         </div>
 
                         <div className="flex items-center gap-1.5">
-                          <Clock className="w-3.5 h-3.5 text-zinc-400" />
-                          <span>Aktif hingga: {formatDateIndo(vacancy.active_until)}</span>
+                          <Clock className="w-3.5 h-3.5 text-slate-400" />
+                          <span>Aktif hingga: <span className="font-medium text-slate-600">{formatDateIndo(vacancy.active_until)}</span></span>
                         </div>
                       </div>
 
@@ -148,9 +148,9 @@ export default function DashboardPage() {
                       <div className="flex items-center gap-2 mt-4">
                         <Link
                           href={`/dashboard/vacancies/${vacancy.id}/edit`}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#fafafa] border border-zinc-200 rounded-md text-xs font-medium text-zinc-700 hover:bg-zinc-100 transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-colors cursor-pointer shadow-2xs active:scale-95"
                         >
-                          <Pencil className="w-3.5 h-3.5 text-zinc-500" />
+                          <Pencil className="w-3.5 h-3.5 text-slate-400" />
                           <span>Edit</span>
                         </Link>
 
@@ -158,7 +158,7 @@ export default function DashboardPage() {
                           type="button"
                           onClick={() => setDeleteTarget({ id: vacancy.id, title: vacancy.title })}
                           disabled={deleteMutation.isPending}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#fecdd3] text-[#be123c] rounded-md text-xs font-semibold hover:bg-rose-200 transition-colors cursor-pointer disabled:opacity-50"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-lg text-xs font-semibold hover:bg-rose-100 transition-colors cursor-pointer disabled:opacity-50 active:scale-95"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                           <span>Hapus</span>

@@ -8,7 +8,7 @@ export default function DashboardCardSkeleton({ count = 3 }: DashboardCardSkelet
       {Array.from({ length: count }).map((_, index) => (
         <div
           key={index}
-          className="bg-white border border-zinc-200 rounded-lg p-5 animate-pulse"
+          className="bg-white border border-slate-200/90 rounded-xl p-5 animate-pulse"
         >
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-start gap-4 flex-1">

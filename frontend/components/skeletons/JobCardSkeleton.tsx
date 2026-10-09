@@ -8,7 +8,7 @@ export default function JobCardSkeleton({ count = 4 }: JobCardSkeletonProps) {
       {Array.from({ length: count }).map((_, index) => (
         <div
           key={index}
-          className="bg-white border border-zinc-200 rounded-lg p-5 animate-pulse"
+          className="bg-white border border-slate-200/90 rounded-xl p-5 animate-pulse"
         >
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             {/* Left section: Logo placeholder + Text placeholders */}
