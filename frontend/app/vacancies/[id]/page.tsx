@@ -1,19 +1,21 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
-import { Building2, MapPin, Users } from 'lucide-react';
+import { Building2, MapPin, Users, ArrowLeft, Share2, Check } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SanitizedHtml from '@/components/SanitizedHtml';
+import VacancyDetailSkeleton from '@/components/skeletons/VacancyDetailSkeleton';
 import { getVacancy } from '@/lib/api';
 import { EMPLOYMENT_TYPE_BADGE_LABELS, MIN_EXPERIENCE_LABELS, formatRupiah } from '@/lib/labels';
 
 function VacancyDetailContent() {
   const params = useParams();
   const id = params?.id as string;
+  const [copied, setCopied] = useState(false);
 
   const {
     data: vacancy,
@@ -25,16 +27,19 @@ function VacancyDetailContent() {
     enabled: Boolean(id),
   });
 
+  const handleCopyLink = () => {
+    if (typeof window !== 'undefined') {
+      navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col bg-white">
         <Navbar />
-        <main className="flex-1 flex items-center justify-center py-20 text-zinc-500">
-          <div className="flex flex-col items-center gap-3">
-            <div className="w-8 h-8 border-2 border-zinc-300 border-t-zinc-800 rounded-full animate-spin" />
-            <p className="text-sm">Memuat detail lowongan...</p>
-          </div>
-        </main>
+        <VacancyDetailSkeleton />
         <Footer />
       </div>
     );
@@ -53,7 +58,7 @@ function VacancyDetailContent() {
           </p>
           <Link
             href="/"
-            className="inline-flex px-4 py-2 bg-[#2d3e50] text-white text-sm font-medium rounded-lg hover:bg-zinc-800 transition-colors"
+            className="inline-flex px-4 py-2 bg-[#2d3e50] text-white text-sm font-medium rounded-lg hover:bg-zinc-800 transition-colors shadow-xs"
           >
             Kembali ke Daftar Lowongan
           </Link>
@@ -70,7 +75,37 @@ function VacancyDetailContent() {
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
 
-      <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-10">
+      <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-8 md:py-10">
+        {/* Navigation / Actions Bar */}
+        <div className="flex items-center justify-between mb-6">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-xs md:text-sm font-medium text-zinc-500 hover:text-zinc-900 transition-colors group"
+          >
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+            <span>Kembali ke lowongan</span>
+          </Link>
+
+          <button
+            type="button"
+            onClick={handleCopyLink}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-zinc-200 rounded-lg text-xs font-medium text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 transition-colors cursor-pointer"
+            title="Salin tautan lowongan"
+          >
+            {copied ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                <span className="text-emerald-600 font-semibold">Tersalin!</span>
+              </>
+            ) : (
+              <>
+                <Share2 className="w-3.5 h-3.5 text-zinc-500" />
+                <span>Bagikan</span>
+              </>
+            )}
+          </button>
+        </div>
+
         {/* Header section */}
         <div className="flex items-start gap-5 pb-8 border-b border-zinc-200">
           <div className="w-16 h-16 md:w-20 md:h-20 bg-[#2d3e50] rounded-lg flex items-center justify-center shrink-0 text-white font-semibold text-xs md:text-sm select-none">
@@ -165,9 +200,7 @@ export default function VacancyDetailPage() {
       fallback={
         <div className="min-h-screen flex flex-col bg-white">
           <Navbar />
-          <main className="flex-1 flex items-center justify-center py-20 text-zinc-500">
-            <div className="w-8 h-8 border-2 border-zinc-300 border-t-zinc-800 rounded-full animate-spin" />
-          </main>
+          <VacancyDetailSkeleton />
           <Footer />
         </div>
       }
@@ -176,3 +209,4 @@ export default function VacancyDetailPage() {
     </Suspense>
   );
 }
+

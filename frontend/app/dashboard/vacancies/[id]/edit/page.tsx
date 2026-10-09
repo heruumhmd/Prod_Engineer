@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import FormSkeleton from '@/components/skeletons/FormSkeleton';
 import { getVacancy, updateVacancy, ApiError } from '@/lib/api';
 import { CreateVacancyPayload, EmploymentType, MinExperience, ApiValidationErrors, Vacancy } from '@/types/vacancy';
 
@@ -367,11 +368,7 @@ function EditVacancyContent() {
   });
 
   if (isLoading) {
-    return (
-      <div className="flex-1 flex items-center justify-center py-20 text-zinc-500">
-        <div className="w-8 h-8 border-2 border-zinc-300 border-t-zinc-800 rounded-full animate-spin" />
-      </div>
-    );
+    return <FormSkeleton />;
   }
 
   if (isError || !vacancy) {
@@ -395,10 +392,11 @@ export default function EditVacancyPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
-      <Suspense fallback={<div className="flex-1 flex items-center justify-center py-20"><div className="w-8 h-8 border-2 border-zinc-300 border-t-zinc-800 rounded-full animate-spin" /></div>}>
+      <Suspense fallback={<FormSkeleton />}>
         <EditVacancyContent />
       </Suspense>
       <Footer />
     </div>
   );
 }
+

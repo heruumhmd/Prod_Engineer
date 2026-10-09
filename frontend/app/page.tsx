@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import Footer from '@/components/Footer';
 import JobCard from '@/components/JobCard';
+import JobCardSkeleton from '@/components/skeletons/JobCardSkeleton';
 import { getVacancies } from '@/lib/api';
 
 export default function HomePage() {
@@ -42,12 +43,12 @@ export default function HomePage() {
       <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-8">
         {/* Section Header with Search Input */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-          <h2 className="text-xl md:text-2xl font-bold text-zinc-900">
+          <h2 className="text-xl md:text-2xl font-bold text-zinc-900 tracking-tight">
             {sectionTitle}
           </h2>
 
-          <div className="relative w-full md:w-80">
-            <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <div className="relative w-full md:w-80 group">
+            <Search className="w-4 h-4 text-zinc-400 group-focus-within:text-zinc-600 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none transition-colors" />
             <input
               type="text"
               data-testid="search-input"
@@ -59,17 +60,28 @@ export default function HomePage() {
                 }
               }}
               placeholder="Pekerjaan apa yang sedang kamu cari?"
-              className="w-full pl-10 pr-4 py-2 border border-zinc-200 rounded-lg text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 transition-colors"
+              className="w-full pl-10 pr-9 py-2 border border-zinc-200 rounded-lg text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 focus:ring-2 focus:ring-zinc-100 transition-all"
             />
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchTerm('');
+                  setDebouncedTerm('');
+                }}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 p-1 rounded-md hover:bg-zinc-100 transition-colors"
+                title="Hapus pencarian"
+                aria-label="Hapus pencarian"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
         </div>
 
         {/* Content list */}
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-16 gap-3 text-zinc-500">
-            <div className="w-8 h-8 border-2 border-zinc-300 border-t-zinc-800 rounded-full animate-spin" />
-            <p className="text-sm">Memuat lowongan...</p>
-          </div>
+          <JobCardSkeleton count={4} />
         ) : isError ? (
           <div className="text-center py-16 text-rose-600 bg-rose-50 border border-rose-200 rounded-lg p-6">
             <p className="font-semibold">Gagal memuat lowongan</p>

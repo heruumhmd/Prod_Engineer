@@ -1,14 +1,18 @@
 'use client';
 
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
-import { Briefcase, Upload, Clock, Pencil, Trash2, Plus } from 'lucide-react';
+import { Briefcase, Upload, Clock, Pencil, Trash2, Plus, AlertTriangle, CheckCircle2, X } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import DashboardCardSkeleton from '@/components/skeletons/DashboardCardSkeleton';
 import { getVacancies, deleteVacancy } from '@/lib/api';
 import { formatDateIndo } from '@/lib/labels';
 
 export default function DashboardPage() {
   const queryClient = useQueryClient();
+  const [deleteTarget, setDeleteTarget] = useState<{ id: number; title: string } | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const {
     data: vacancies = [],
@@ -19,19 +23,28 @@ export default function DashboardPage() {
     queryFn: () => getVacancies(),
   });
 
+  const showToast = (message: string) => {
+    setToastMessage(message);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 3500);
+  };
+
   const deleteMutation = useMutation({
     mutationFn: (id: number) => deleteVacancy(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vacancies'] });
+      setDeleteTarget(null);
+      showToast('Lowongan berhasil dihapus');
     },
     onError: (err) => {
       alert('Gagal menghapus lowongan: ' + (err as Error).message);
     },
   });
 
-  const handleDelete = (id: number, title: string) => {
-    if (window.confirm(`Apakah Anda yakin ingin menghapus lowongan "${title}"?`)) {
-      deleteMutation.mutate(id);
+  const confirmDelete = () => {
+    if (deleteTarget) {
+      deleteMutation.mutate(deleteTarget.id);
     }
   };
 
@@ -42,7 +55,7 @@ export default function DashboardPage() {
       <div className="flex-1 max-w-6xl w-full mx-auto px-4 py-8 flex flex-col md:flex-row gap-8">
         {/* Left Sidebar */}
         <aside className="w-full md:w-64 shrink-0">
-          <div className="bg-white border border-zinc-200 rounded-lg p-5">
+          <div className="bg-white border border-zinc-200 rounded-lg p-5 shadow-xs">
             <div className="flex items-center justify-between pb-4 border-b border-zinc-200 mb-4">
               <span className="font-bold text-lg text-zinc-900">Jobs</span>
               {/* Circuit line icon */}
@@ -67,13 +80,13 @@ export default function DashboardPage() {
         {/* Main Content */}
         <main className="flex-1">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-zinc-900">
+            <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">
               Lowongan Saya
             </h1>
 
             <Link
               href="/dashboard/vacancies/new"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-[#2d3e50] text-white rounded-lg text-sm font-medium hover:bg-zinc-800 transition-colors shadow-xs"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#2d3e50] text-white rounded-lg text-sm font-medium hover:bg-zinc-800 transition-colors shadow-xs active:scale-[0.98]"
             >
               <Plus className="w-4 h-4" />
               <span>Buat lowongan</span>
@@ -81,10 +94,7 @@ export default function DashboardPage() {
           </div>
 
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-20 text-zinc-500 bg-white border border-zinc-200 rounded-lg">
-              <div className="w-8 h-8 border-2 border-zinc-300 border-t-zinc-800 rounded-full animate-spin mb-3" />
-              <p className="text-sm">Memuat lowongan...</p>
-            </div>
+            <DashboardCardSkeleton count={3} />
           ) : isError ? (
             <div className="p-6 text-center bg-rose-50 border border-rose-200 rounded-lg text-rose-700">
               <p className="font-semibold text-sm">Gagal memuat lowongan dashboard</p>
@@ -94,7 +104,7 @@ export default function DashboardPage() {
               <p className="text-zinc-600 text-sm mb-4">Belum ada lowongan yang dibuat.</p>
               <Link
                 href="/dashboard/vacancies/new"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-[#2d3e50] text-white rounded-lg text-sm font-medium hover:bg-zinc-800 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[#2d3e50] text-white rounded-lg text-sm font-medium hover:bg-zinc-800 transition-colors active:scale-[0.98]"
               >
                 <Plus className="w-4 h-4" />
                 <span>Buat lowongan pertama</span>
@@ -106,7 +116,7 @@ export default function DashboardPage() {
                 <div
                   key={vacancy.id}
                   data-testid="dashboard-vacancy-card"
-                  className="bg-white border border-zinc-200 rounded-lg p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs"
+                  className="bg-white border border-zinc-200 rounded-lg p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs hover:border-zinc-300 transition-all"
                 >
                   <div className="flex items-start gap-4">
                     {/* Navy logo box with '9' mark matching Figma Frame 3 */}
@@ -146,7 +156,7 @@ export default function DashboardPage() {
 
                         <button
                           type="button"
-                          onClick={() => handleDelete(vacancy.id, vacancy.title)}
+                          onClick={() => setDeleteTarget({ id: vacancy.id, title: vacancy.title })}
                           disabled={deleteMutation.isPending}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#fecdd3] text-[#be123c] rounded-md text-xs font-semibold hover:bg-rose-200 transition-colors cursor-pointer disabled:opacity-50"
                         >
@@ -162,6 +172,62 @@ export default function DashboardPage() {
           )}
         </main>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl border border-zinc-200">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-base font-bold text-zinc-900">
+                  Hapus Lowongan Pekerjaan
+                </h3>
+                <p className="text-sm text-zinc-600 mt-1">
+                  Apakah Anda yakin ingin menghapus lowongan <span className="font-semibold text-zinc-900">&quot;{deleteTarget.title}&quot;</span>? Tindakan ini tidak dapat dibatalkan.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-zinc-100">
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                disabled={deleteMutation.isPending}
+                className="px-4 py-2 text-sm font-medium text-zinc-700 bg-zinc-100 hover:bg-zinc-200 rounded-lg transition-colors cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={confirmDelete}
+                disabled={deleteMutation.isPending}
+                className="px-4 py-2 text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+              >
+                {deleteMutation.isPending ? 'Menghapus...' : 'Ya, Hapus'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-zinc-900 text-white px-4 py-3 rounded-lg shadow-lg border border-zinc-800 animate-in slide-in-from-bottom-2 duration-200">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span className="text-sm font-medium">{toastMessage}</span>
+          <button
+            type="button"
+            onClick={() => setToastMessage(null)}
+            className="text-zinc-400 hover:text-white ml-2"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
+
