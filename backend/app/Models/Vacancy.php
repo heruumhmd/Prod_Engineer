@@ -53,7 +53,7 @@ class Vacancy extends Model
         $trimmed = trim((string) $term);
         if ($trimmed !== '') {
             $escaped = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $trimmed);
-            $query->where('title', 'like', "%{$escaped}%");
+            $query->whereRaw("title LIKE ? ESCAPE '\\'", ["%{$escaped}%"]);
         }
         return $query;
     }
